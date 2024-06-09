@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -43,7 +42,10 @@ impl<T> LinkedList<T> {
             end: None,
         }
     }
+}
 
+impl<T: PartialOrd + Clone + std::cmp::PartialOrd> LinkedList<T> {
+    
     pub fn add(&mut self, obj: T) {
         let mut node = Box::new(Node::new(obj));
         node.next = None;
@@ -69,14 +71,45 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+
+    pub fn len(self: &Self) -> i32 {
+        self.length.try_into().unwrap()
+    }
+
+	pub fn merge(list_a: LinkedList<T>, list_b: LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+		let mut _list = LinkedList::new();
+
+        let mut a_current = list_a.start;
+        let mut b_current = list_b.start;
+
+        while a_current.is_some() || b_current.is_some() {
+            let a_next_val = a_current.map(|ptr| unsafe { &(*ptr.as_ptr()).val });
+            let b_next_val = b_current.map(|ptr| unsafe { &(*ptr.as_ptr()).val });
+
+            match (a_next_val, b_next_val) {
+                (Some(a_val), Some(b_val)) => {
+                    if a_val <= b_val {
+                        _list.add(a_val.clone());
+                        a_current = unsafe { (*a_current.unwrap().as_ptr()).next };
+                    } else {
+                        _list.add(b_val.clone());
+                        b_current = unsafe { (*b_current.unwrap().as_ptr()).next };
+                    }
+                },
+                (Some(a_val),  None) => {
+                    _list.add(a_val.clone());
+                    a_current = unsafe { (*a_current.unwrap().as_ptr()).next };
+                },
+                (None, Some(b_val)) => {
+                    _list.add(b_val.clone());
+                    b_current = unsafe { (*b_current.unwrap().as_ptr()).next };
+                },
+                (None, None) => break,
+            }
         }
+
+        _list
 	}
 }
 

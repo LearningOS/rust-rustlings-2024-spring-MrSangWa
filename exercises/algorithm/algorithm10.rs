@@ -29,7 +29,14 @@ impl Graph for UndirectedGraph {
         &self.adjacency_table
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        let (u, v, w) = edge;
+        let u = u.to_string();
+        let v = v.to_string();
+
+        let edges = self.adjacency_table_mutable().entry(u.clone()).or_insert(vec![]);
+        edges.push((v.clone(), w));
+        let edges = self.adjacency_table_mutable().entry(v.clone()).or_insert(vec![]);
+        edges.push((u.clone(), w));
     }
 }
 pub trait Graph {
